@@ -1,0 +1,598 @@
+From d7fff42875820b7b8e9a03083517a9d1dae78e4f Mon Sep 17 00:00:00 2001
+From: Christophe Troestler <Christophe.Troestler@umons.ac.be>
+Date: Fri, 27 Nov 2015 22:30:41 +0100
+Subject: [PATCH] Protect install paths against spaces (on Windows)
+Content-Type: text/plain; charset="utf-8"
+
+---
+ Makefile.nt                      | 51 ++++++++++++++++++++--------------------
+ asmrun/Makefile.nt               |  2 +-
+ byterun/Makefile                 |  6 ++---
+ byterun/Makefile.common          | 18 +++++++-------
+ debugger/Makefile.shared         |  2 +-
+ ocamlbuild/Makefile              | 16 ++++++-------
+ ocamldoc/Makefile                | 26 ++++++++++----------
+ ocamldoc/Makefile.nt             | 21 +++++++++--------
+ otherlibs/Makefile.shared        | 18 +++++++-------
+ otherlibs/dynlink/Makefile       |  8 +++----
+ otherlibs/systhreads/Makefile.nt | 19 ++++++++-------
+ stdlib/Makefile                  | 25 ++++++++++----------
+ stdlib/Makefile.nt               |  2 +-
+ stdlib/Makefile.shared           |  6 ++---
+ tools/Makefile                   |  2 +-
+ tools/Makefile.nt                |  2 +-
+ tools/Makefile.shared            | 30 +++++++++++------------
+ 17 files changed, 130 insertions(+), 124 deletions(-)
+
+diff --git a/Makefile.nt b/Makefile.nt
+index 76a74e1..9f842dc 100644
+--- a/Makefile.nt
++++ b/Makefile.nt
+@@ -138,32 +138,33 @@ INSTALL_LIBDIR=$(DESTDIR)$(LIBDIR)
+ INSTALL_COMPLIBDIR=$(DESTDIR)$(COMPLIBDIR)
+ INSTALL_STUBLIBDIR=$(DESTDIR)$(STUBLIBDIR)
+ INSTALL_MANDIR=$(DESTDIR)$(MANDIR)
++INSTALL_DISTRIB=$(DESTDIR)$(PREFIX)
+ 
+ install: installbyt installopt
+ 
+ installbyt:
+-	mkdir -p $(INSTALL_BINDIR)
+-	mkdir -p $(INSTALL_LIBDIR)
+-	mkdir -p $(INSTALL_STUBLIBDIR)
+-	mkdir -p $(INSTALL_COMPLIBDIR)
+-	cp VERSION $(INSTALL_LIBDIR)/
++	mkdir -p "$(INSTALL_BINDIR)"
++	mkdir -p "$(INSTALL_LIBDIR)"
++	mkdir -p "$(INSTALL_STUBLIBDIR)"
++	mkdir -p "$(INSTALL_COMPLIBDIR)"
++	cp VERSION "$(INSTALL_LIBDIR)/"
+ 	cd byterun ; $(MAKEREC) install
+-	cp ocamlc $(INSTALL_BINDIR)/ocamlc.exe
+-	cp ocaml $(INSTALL_BINDIR)/ocaml.exe
++	cp ocamlc "$(INSTALL_BINDIR)/ocamlc.exe"
++	cp ocaml "$(INSTALL_BINDIR)/ocaml.exe"
+ 	cd stdlib ; $(MAKEREC) install
+-	cp lex/ocamllex $(INSTALL_BINDIR)/ocamllex.exe
+-	cp yacc/ocamlyacc.exe $(INSTALL_BINDIR)/ocamlyacc.exe
++	cp lex/ocamllex "$(INSTALL_BINDIR)/ocamllex.exe"
++	cp yacc/ocamlyacc.exe "$(INSTALL_BINDIR)/ocamlyacc.exe"
+ 	cp utils/*.cmi utils/*.cmt utils/*.cmti \
+ 	   parsing/*.cmi parsing/*.cmt parsing/*.cmti \
+ 	   typing/*.cmi typing/*.cmt typing/*.cmti \
+ 	   bytecomp/*.cmi bytecomp/*.cmt bytecomp/*.cmti \
+ 	   driver/*.cmi driver/*.cmt driver/*.cmti \
+-	   toplevel/*.cmi toplevel/*.cmt toplevel/*.cmti $(INSTALL_COMPLIBDIR)
++	   toplevel/*.cmi toplevel/*.cmt toplevel/*.cmti "$(INSTALL_COMPLIBDIR)"
+ 	cp compilerlibs/ocamlcommon.cma compilerlibs/ocamlbytecomp.cma \
+ 	   compilerlibs/ocamltoplevel.cma $(BYTESTART) $(TOPLEVELSTART) \
+-	   $(INSTALL_COMPLIBDIR)
+-	cp expunge $(INSTALL_LIBDIR)/expunge.exe
+-	cp toplevel/topdirs.cmi $(INSTALL_LIBDIR)
++	   "$(INSTALL_COMPLIBDIR)"
++	cp expunge "$(INSTALL_LIBDIR)/expunge.exe"
++	cp toplevel/topdirs.cmi "$(INSTALL_LIBDIR)"
+ 	cd tools ; $(MAKEREC) install
+ 	for i in $(OTHERLIBRARIES); do \
+ 	  $(MAKEREC) -C otherlibs/$$i install || exit $$?; \
+@@ -174,19 +175,19 @@ installbyt:
+ 	   else :; fi
+ 	if test -n "$(WITH_OCAMLBUILD)"; then (cd ocamlbuild; $(MAKE) install); \
+ 	   else :; fi
+-	cp config/Makefile $(INSTALL_LIBDIR)/Makefile.config
+-	cp README $(INSTALL_DISTRIB)/Readme.general.txt
+-	cp README.win32 $(INSTALL_DISTRIB)/Readme.windows.txt
+-	cp LICENSE $(INSTALL_DISTRIB)/License.txt
+-	cp Changes $(INSTALL_DISTRIB)/Changes.txt
++	cp config/Makefile "$(INSTALL_LIBDIR)/Makefile.config"
++	cp README "$(INSTALL_DISTRIB)/Readme.general.txt"
++	cp README.win32 "$(INSTALL_DISTRIB)/Readme.windows.txt"
++	cp LICENSE "$(INSTALL_DISTRIB)/License.txt"
++	cp Changes "$(INSTALL_DISTRIB)/Changes.txt"
+ 
+ # Installation of the native-code compiler
+ installopt:
+ 	cd asmrun ; $(MAKEREC) install
+-	cp ocamlopt $(INSTALL_BINDIR)/ocamlopt.exe
++	cp ocamlopt "$(INSTALL_BINDIR)/ocamlopt.exe"
+ 	cd stdlib ; $(MAKEREC) installopt
+-	cp asmcomp/*.cmi asmcomp/*.cmt asmcomp/*.cmti $(INSTALL_COMPLIBDIR)
+-	cp compilerlibs/ocamloptcomp.cma $(OPTSTART) $(INSTALL_COMPLIBDIR)
++	cp asmcomp/*.cmi asmcomp/*.cmt asmcomp/*.cmti "$(INSTALL_COMPLIBDIR)"
++	cp compilerlibs/ocamloptcomp.cma $(OPTSTART) "$(INSTALL_COMPLIBDIR)"
+ 	if test -n "$(WITH_OCAMLDOC)"; then (cd ocamldoc; $(MAKEREC) installopt); fi
+ 	if test -n "$(WITH_OCAMLBUILD)"; then (cd ocamlbuild; $(MAKE) installopt); \
+ 	   else :; fi
+@@ -197,15 +198,15 @@ installopt:
+ 	cd tools; $(MAKEREC) installopt
+ 
+ installoptopt:
+-	cp ocamlc.opt $(INSTALL_BINDIR)/ocamlc.opt$(EXE)
+-	cp ocamlopt.opt $(INSTALL_BINDIR)/ocamlopt.opt$(EXE)
+-	cp lex/ocamllex.opt $(INSTALL_BINDIR)/ocamllex.opt$(EXE)
++	cp ocamlc.opt "$(INSTALL_BINDIR)/ocamlc.opt$(EXE)"
++	cp ocamlopt.opt "$(INSTALL_BINDIR)/ocamlopt.opt$(EXE)"
++	cp lex/ocamllex.opt "$(INSTALL_BINDIR)/ocamllex.opt$(EXE)"
+ 	cp compilerlibs/ocamlcommon.cmxa compilerlibs/ocamlcommon.$(A) \
+            compilerlibs/ocamlbytecomp.cmxa compilerlibs/ocamlbytecomp.$(A) \
+            compilerlibs/ocamloptcomp.cmxa compilerlibs/ocamloptcomp.$(A) \
+            $(BYTESTART:.cmo=.cmx) $(BYTESTART:.cmo=.$(O)) \
+            $(OPTSTART:.cmo=.cmx) $(OPTSTART:.cmo=.$(O)) \
+-           $(INSTALL_COMPLIBDIR)
++           "$(INSTALL_COMPLIBDIR)"
+ 
+ clean:: partialclean
+ 
+diff --git a/asmrun/Makefile.nt b/asmrun/Makefile.nt
+index 4a1056f..7ff5e63 100644
+--- a/asmrun/Makefile.nt
++++ b/asmrun/Makefile.nt
+@@ -61,7 +61,7 @@ amd64.o: amd64.S
+ INSTALL_LIBDIR=$(DESTDIR)$(LIBDIR)
+ 
+ install:
+-	cp libasmrun.$(A) $(INSTALL_LIBDIR)
++	cp libasmrun.$(A) "$(INSTALL_LIBDIR)"
+ 
+ $(LINKEDFILES): %.c: ../byterun/%.c
+ 	cp ../byterun/$*.c $*.c
+diff --git a/byterun/Makefile b/byterun/Makefile
+index d24902b..f33024e 100644
+--- a/byterun/Makefile
++++ b/byterun/Makefile
+@@ -57,9 +57,9 @@ install-noshared:
+ .PHONY: install-noshared
+ 
+ install-shared:
+-	cp libcamlrun_shared.so $(INSTALL_LIBDIR)/libcamlrun_shared.so
+-	cp libcamlrun_pic.a $(INSTALL_LIBDIR)/libcamlrun_pic.a
+-	cd $(INSTALL_LIBDIR); $(RANLIB) libcamlrun_pic.a
++	cp libcamlrun_shared.so "$(INSTALL_LIBDIR)/libcamlrun_shared.so"
++	cp libcamlrun_pic.a "$(INSTALL_LIBDIR)/libcamlrun_pic.a"
++	cd "$(INSTALL_LIBDIR)"; $(RANLIB) libcamlrun_pic.a
+ .PHONY: install-shared
+ 
+ clean::
+diff --git a/byterun/Makefile.common b/byterun/Makefile.common
+index 7aef44a..d55905a 100644
+--- a/byterun/Makefile.common
++++ b/byterun/Makefile.common
+@@ -59,15 +59,15 @@ INSTALL_LIBDIR=$(DESTDIR)$(LIBDIR)
+ 
+ 
+ install::
+-	cp $(CAMLRUN)$(EXE) $(INSTALL_BINDIR)/ocamlrun$(EXE)
+-	cp libcamlrun.$(A) $(INSTALL_LIBDIR)/libcamlrun.$(A)
+-	cd $(INSTALL_LIBDIR); $(RANLIB) libcamlrun.$(A)
+-	if test -d $(INSTALL_LIBDIR)/caml; then : ; \
+-	  else mkdir $(INSTALL_LIBDIR)/caml; fi
++	cp $(CAMLRUN)$(EXE) "$(INSTALL_BINDIR)/ocamlrun$(EXE)"
++	cp libcamlrun.$(A) "$(INSTALL_LIBDIR)/libcamlrun.$(A)"
++	cd "$(INSTALL_LIBDIR)"; $(RANLIB) libcamlrun.$(A)
++	if test -d "$(INSTALL_LIBDIR)/caml"; then : ; \
++	  else mkdir "$(INSTALL_LIBDIR)/caml"; fi
+ 	for i in $(PUBLIC_INCLUDES); do \
+-	  sed -f ../tools/cleanup-header caml/$$i > $(INSTALL_LIBDIR)/caml/$$i; \
++	  sed -f ../tools/cleanup-header caml/$$i > "$(INSTALL_LIBDIR)/caml/$$i"; \
+ 	done
+-	cp ld.conf $(INSTALL_LIBDIR)/ld.conf
++	cp ld.conf "$(INSTALL_LIBDIR)/ld.conf"
+ .PHONY: install
+ 
+ install:: install-$(RUNTIMED)
+@@ -80,8 +80,8 @@ install-noruntimed:
+ # because it's an executable for the target machine, while we're installing
+ # binaries for the host.
+ install-runtimed:
+-	cp ocamlrund$(EXE) $(INSTALL_BINDIR)/ocamlrund$(EXE)
+-	cp libcamlrund.$(A) $(INSTALL_LIBDIR)/libcamlrund.$(A)
++	cp ocamlrund$(EXE) "$(INSTALL_BINDIR)/ocamlrund$(EXE)"
++	cp libcamlrund.$(A) "$(INSTALL_LIBDIR)/libcamlrund.$(A)"
+ .PHONY: install-runtimed
+ 
+ # If primitives contain duplicated lines (e.g. because the code is defined
+diff --git a/debugger/Makefile.shared b/debugger/Makefile.shared
+index 05d8d50..b09df04 100644
+--- a/debugger/Makefile.shared
++++ b/debugger/Makefile.shared
+@@ -89,7 +89,7 @@ ocamldebug$(EXE): $(OBJS) $(OTHEROBJS)
+ 	$(CAMLC) $(LINKFLAGS) -o ocamldebug$(EXE) -linkall $(OTHEROBJS) $(OBJS)
+ 
+ install:
+-	cp ocamldebug$(EXE) $(INSTALL_BINDIR)/ocamldebug$(EXE)
++	cp ocamldebug$(EXE) "$(INSTALL_BINDIR)/ocamldebug$(EXE)"
+ 
+ clean::
+ 	rm -f ocamldebug$(EXE)
+diff --git a/ocamlbuild/Makefile b/ocamlbuild/Makefile
+index 2173de7..1c3bdba 100644
+--- a/ocamlbuild/Makefile
++++ b/ocamlbuild/Makefile
+@@ -168,19 +168,19 @@ beforedepend:: glob_lexer.ml
+ # Installation
+ 
+ install:
+-	$(CP) ocamlbuild.byte $(INSTALL_BINDIR)/ocamlbuild$(EXE)
+-	$(CP) ocamlbuild.byte $(INSTALL_BINDIR)/ocamlbuild.byte$(EXE)
+-	mkdir -p $(INSTALL_LIBDIR)
+-	$(CP) $(INSTALL_LIB) $(INSTALL_LIBDIR)/
++	$(CP) ocamlbuild.byte "$(INSTALL_BINDIR)/ocamlbuild$(EXE)"
++	$(CP) ocamlbuild.byte "$(INSTALL_BINDIR)/ocamlbuild.byte$(EXE)"
++	mkdir -p "$(INSTALL_LIBDIR)"
++	$(CP) $(INSTALL_LIB) "$(INSTALL_LIBDIR)/"
+ 
+ installopt:
+ 	if test -f ocamlbuild.native; then $(MAKE) installopt_really; fi
+ 
+ installopt_really:
+-	$(CP) ocamlbuild.native $(INSTALL_BINDIR)/ocamlbuild$(EXE)
+-	$(CP) ocamlbuild.native $(INSTALL_BINDIR)/ocamlbuild.native$(EXE)
+-	mkdir -p $(INSTALL_LIBDIR)
+-	$(CP) $(INSTALL_LIB_OPT) $(INSTALL_LIBDIR)/
++	$(CP) ocamlbuild.native "$(INSTALL_BINDIR)/ocamlbuild$(EXE)"
++	$(CP) ocamlbuild.native "$(INSTALL_BINDIR)/ocamlbuild.native$(EXE)"
++	mkdir -p "$(INSTALL_LIBDIR)"
++	$(CP) $(INSTALL_LIB_OPT) "$(INSTALL_LIBDIR)/"
+ 
+ # The generic rules
+ 
+diff --git a/ocamldoc/Makefile b/ocamldoc/Makefile
+index e4ce7ec..b552b65 100644
+--- a/ocamldoc/Makefile
++++ b/ocamldoc/Makefile
+@@ -249,24 +249,24 @@ odoc_see_lexer.ml: odoc_see_lexer.mll
+ # Installation targets
+ ######################
+ install: dummy
+-	if test -d $(INSTALL_BINDIR); then : ; else $(MKDIR) $(INSTALL_BINDIR); fi
+-	if test -d $(INSTALL_LIBDIR); then : ; else $(MKDIR) $(INSTALL_LIBDIR); fi
+-	if test -d $(INSTALL_CUSTOMDIR); then : ; else $(MKDIR) $(INSTALL_CUSTOMDIR); fi
+-	$(CP) $(OCAMLDOC) $(INSTALL_BINDIR)/$(OCAMLDOC)$(EXE)
+-	$(CP) ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) $(INSTALL_LIBDIR)
+-	$(CP) $(INSTALL_MLIS) $(INSTALL_CMIS) $(INSTALL_LIBDIR)
+-	if test -d $(INSTALL_MANODIR); then : ; else $(MKDIR) $(INSTALL_MANODIR); fi
+-	if test -d stdlib_man; then $(CP) stdlib_man/* $(INSTALL_MANODIR); else : ; fi
++	if test -d "$(INSTALL_BINDIR)"; then : ; else $(MKDIR) "$(INSTALL_BINDIR)"; fi
++	if test -d "$(INSTALL_LIBDIR)"; then : ; else $(MKDIR) "$(INSTALL_LIBDIR)"; fi
++	if test -d "$(INSTALL_CUSTOMDIR)"; then : ; else $(MKDIR) "$(INSTALL_CUSTOMDIR)"; fi
++	$(CP) $(OCAMLDOC) "$(INSTALL_BINDIR)/$(OCAMLDOC)$(EXE)"
++	$(CP) ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) "$(INSTALL_LIBDIR)"
++	$(CP) $(INSTALL_MLIS) $(INSTALL_CMIS) "$(INSTALL_LIBDIR)"
++	if test -d "$(INSTALL_MANODIR)"; then : ; else $(MKDIR) "$(INSTALL_MANODIR)"; fi
++	if test -d stdlib_man; then $(CP) stdlib_man/* "$(INSTALL_MANODIR)"; else : ; fi
+ 
+ installopt:
+ 	if test -f $(OCAMLDOC_OPT); then $(MAKE) installopt_really ; fi
+ 
+ installopt_really:
+-	if test -d $(INSTALL_BINDIR); then : ; else $(MKDIR) $(INSTALL_BINDIR); fi
+-	if test -d $(INSTALL_LIBDIR); then : ; else $(MKDIR) $(INSTALL_LIBDIR); fi
+-	$(CP) $(OCAMLDOC_OPT) $(INSTALL_BINDIR)/$(OCAMLDOC_OPT)$(EXE)
+-	$(CP) ocamldoc.hva $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) $(INSTALL_LIBDIR)
+-	$(CP) $(INSTALL_MLIS) $(INSTALL_CMIS) $(INSTALL_LIBDIR)
++	if test -d "$(INSTALL_BINDIR)"; then : ; else $(MKDIR) "$(INSTALL_BINDIR)"; fi
++	if test -d "$(INSTALL_LIBDIR)"; then : ; else $(MKDIR) "$(INSTALL_LIBDIR)"; fi
++	$(CP) $(OCAMLDOC_OPT) "$(INSTALL_BINDIR)/$(OCAMLDOC_OPT)$(EXE)"
++	$(CP) ocamldoc.hva $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) "$(INSTALL_LIBDIR)"
++	$(CP) $(INSTALL_MLIS) $(INSTALL_CMIS) "$(INSTALL_LIBDIR)"
+ 
+ # Testing :
+ ###########
+diff --git a/ocamldoc/Makefile.nt b/ocamldoc/Makefile.nt
+index 9c00959..785ed4c 100644
+--- a/ocamldoc/Makefile.nt
++++ b/ocamldoc/Makefile.nt
+@@ -210,21 +210,22 @@ odoc_see_lexer.ml: odoc_see_lexer.mll
+ # Installation targets
+ ######################
+ install: dummy
+-	$(MKDIR) -p $(INSTALL_BINDIR)
+-	$(MKDIR) -p $(INSTALL_LIBDIR)
+-	$(CP) $(OCAMLDOC) $(INSTALL_BINDIR)/$(OCAMLDOC)$(EXE)
+-	$(CP) ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) $(INSTALL_LIBDIR)
+-	$(CP) $(INSTALL_MLIS) $(INSTALL_CMIS) $(INSTALL_LIBDIR)
++	$(MKDIR) -p "$(INSTALL_BINDIR)"
++	$(MKDIR) -p "$(INSTALL_LIBDIR)"
++	$(CP) $(OCAMLDOC) "$(INSTALL_BINDIR)/$(OCAMLDOC)$(EXE)"
++	$(CP) ocamldoc.hva *.cmi $(OCAMLDOC_LIBCMA) "$(INSTALL_LIBDIR)"
++	$(CP) $(INSTALL_MLIS) $(INSTALL_CMIS) "$(INSTALL_LIBDIR)"
+ 
+ installopt:
+ 	if test -f $(OCAMLDOC_OPT); then $(MAKEREC) installopt_really; fi
+ 
+ installopt_really:
+-	$(MKDIR) -p $(INSTALL_BINDIR)
+-	$(MKDIR) -p $(INSTALL_LIBDIR)
+-	$(CP) $(OCAMLDOC_OPT) $(INSTALL_BINDIR)/$(OCAMLDOC_OPT)$(EXE)
+-	$(CP) ocamldoc.hva $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) $(INSTALL_LIBDIR)
+-	$(CP) $(INSTALL_MLIS) $(INSTALL_CMIS) $(INSTALL_LIBDIR)
++	$(MKDIR) -p "$(INSTALL_BINDIR)"
++	$(MKDIR) -p "$(INSTALL_LIBDIR)"
++	$(CP) $(OCAMLDOC_OPT) "$(INSTALL_BINDIR)/$(OCAMLDOC_OPT)$(EXE)"
++	$(CP) ocamldoc.hva $(OCAMLDOC_LIBA) $(OCAMLDOC_LIBCMXA) \
++	  "$(INSTALL_LIBDIR)"
++	$(CP) $(INSTALL_MLIS) $(INSTALL_CMIS) "$(INSTALL_LIBDIR)"
+ 
+ 
+ # backup, clean and depend :
+diff --git a/otherlibs/Makefile.shared b/otherlibs/Makefile.shared
+index cb8bf17..7b4d3d9 100644
+--- a/otherlibs/Makefile.shared
++++ b/otherlibs/Makefile.shared
+@@ -62,16 +62,18 @@ INSTALL_STUBLIBDIR=$(DESTDIR)$(STUBLIBDIR)
+ 
+ install::
+ 	if test -f dll$(CLIBNAME)$(EXT_DLL); then \
+-	  cp dll$(CLIBNAME)$(EXT_DLL) $(INSTALL_STUBLIBDIR)/; fi
+-	cp lib$(CLIBNAME).$(A) $(INSTALL_LIBDIR)/
+-	cd $(INSTALL_LIBDIR); $(RANLIB) lib$(CLIBNAME).$(A)
+-	cp $(LIBNAME).cma $(CMIFILES) $(CMIFILES:.cmi=.mli) $(INSTALL_LIBDIR)/
+-	if test -n "$(HEADERS)"; then cp $(HEADERS) $(INSTALL_LIBDIR)/caml/; fi
++	  cp dll$(CLIBNAME)$(EXT_DLL) "$(INSTALL_STUBLIBDIR)/"; fi
++	cp lib$(CLIBNAME).$(A) "$(INSTALL_LIBDIR)/"
++	cd "$(INSTALL_LIBDIR)"; $(RANLIB) lib$(CLIBNAME).$(A)
++	cp $(LIBNAME).cma $(CMIFILES) $(CMIFILES:.cmi=.mli) "$(INSTALL_LIBDIR)/"
++	if test -n "$(HEADERS)"; then \
++	  cp $(HEADERS) "$(INSTALL_LIBDIR)/caml/"; fi
+ 
+ installopt:
+-	cp $(CAMLOBJS_NAT) $(LIBNAME).cmxa $(LIBNAME).$(A) $(INSTALL_LIBDIR)/
+-	cd $(INSTALL_LIBDIR); $(RANLIB) $(LIBNAME).a
+-	if test -f $(LIBNAME).cmxs; then cp $(LIBNAME).cmxs $(INSTALL_LIBDIR)/; fi
++	cp $(CAMLOBJS_NAT) $(LIBNAME).cmxa $(LIBNAME).$(A) "$(INSTALL_LIBDIR)/"
++	cd "$(INSTALL_LIBDIR)"; $(RANLIB) $(LIBNAME).a
++	if test -f $(LIBNAME).cmxs; then \
++	  cp $(LIBNAME).cmxs "$(INSTALL_LIBDIR)/"; fi
+ 
+ partialclean:
+ 	rm -f *.cm*
+diff --git a/otherlibs/dynlink/Makefile b/otherlibs/dynlink/Makefile
+index 3ae1bb3..3f23973 100644
+--- a/otherlibs/dynlink/Makefile
++++ b/otherlibs/dynlink/Makefile
+@@ -77,13 +77,13 @@ extract_crc: dynlink.cma extract_crc.cmo
+ INSTALL_LIBDIR=$(DESTDIR)$(LIBDIR)
+ 
+ install:
+-	cp dynlink.cmi dynlink.cma dynlink.mli $(INSTALL_LIBDIR)
+-	cp extract_crc $(INSTALL_LIBDIR)/extract_crc$(EXE)
++	cp dynlink.cmi dynlink.cma dynlink.mli "$(INSTALL_LIBDIR)"
++	cp extract_crc "$(INSTALL_LIBDIR)/extract_crc$(EXE)"
+ 
+ installopt:
+ 	if $(NATDYNLINK); then \
+-	  cp $(NATOBJS) dynlink.cmxa dynlink.$(A) $(INSTALL_LIBDIR) && \
+-	  cd $(INSTALL_LIBDIR) && $(RANLIB) dynlink.$(A); \
++	  cp $(NATOBJS) dynlink.cmxa dynlink.$(A) "$(INSTALL_LIBDIR)" && \
++	  cd "$(INSTALL_LIBDIR)" && $(RANLIB) dynlink.$(A); \
+ 	fi
+ 
+ partialclean:
+diff --git a/otherlibs/systhreads/Makefile.nt b/otherlibs/systhreads/Makefile.nt
+index 22fb1c7..e6c603f 100644
+--- a/otherlibs/systhreads/Makefile.nt
++++ b/otherlibs/systhreads/Makefile.nt
+@@ -76,17 +76,18 @@ INSTALL_LIBDIR=$(DESTDIR)$(LIBDIR)
+ INSTALL_STUBLIBDIR=$(DESTDIR)$(STUBLIBDIR)
+ 
+ install:
+-	cp dllthreads.dll $(INSTALL_STUBLIBDIR)/dllthreads.dll
+-	cp libthreads.$(A) $(INSTALL_LIBDIR)/libthreads.$(A)
+-	mkdir -p $(INSTALL_LIBDIR)/threads
+-	cp $(CMIFILES) threads.cma $(INSTALL_LIBDIR)/threads
+-	rm -f $(INSTALL_LIBDIR)/threads/stdlib.cma
+-	cp threads.h $(INSTALL_LIBDIR)/caml/threads.h
++	cp dllthreads.dll "$(INSTALL_STUBLIBDIR)/dllthreads.dll"
++	cp libthreads.$(A) "$(INSTALL_LIBDIR)/libthreads.$(A)"
++	mkdir -p "$(INSTALL_LIBDIR)/threads"
++	cp $(CMIFILES) threads.cma "$(INSTALL_LIBDIR)/threads"
++	rm -f "$(INSTALL_LIBDIR)/threads/stdlib.cma"
++	cp threads.h "$(INSTALL_LIBDIR)/caml/threads.h"
+ 
+ installopt:
+-	cp libthreadsnat.$(A) $(INSTALL_LIBDIR)/libthreadsnat.$(A)
+-	cp $(THREAD_OBJS:.cmo=.cmx) threads.cmxa threads.$(A) $(INSTALL_LIBDIR)/threads
+-	cp threads.cmxs $(INSTALL_LIBDIR)/threads
++	cp libthreadsnat.$(A) "$(INSTALL_LIBDIR)/libthreadsnat.$(A)"
++	cp $(THREAD_OBJS:.cmo=.cmx) threads.cmxa threads.$(A) \
++	  "$(INSTALL_LIBDIR)/threads"
++	cp threads.cmxs "$(INSTALL_LIBDIR)/threads"
+ 
+ .SUFFIXES: .ml .mli .cmo .cmi .cmx
+ 
+diff --git a/stdlib/Makefile b/stdlib/Makefile
+index 92fa374..8d152fe 100644
+--- a/stdlib/Makefile
++++ b/stdlib/Makefile
+@@ -25,22 +25,23 @@ allopt-prof: stdlib.p.cmxa std_exit.p.cmx
+ installopt: installopt-default installopt-$(PROFILING)
+ 
+ installopt-default:
+-	cp stdlib.cmxa stdlib.a std_exit.o *.cmx $(INSTALL_LIBDIR)
+-	cd $(INSTALL_LIBDIR); $(RANLIB) stdlib.a
++	cp stdlib.cmxa stdlib.a std_exit.o *.cmx "$(INSTALL_LIBDIR)"
++	cd "$(INSTALL_LIBDIR)"; $(RANLIB) stdlib.a
+ 
+ installopt-noprof:
+-	rm -f $(INSTALL_LIBDIR)/stdlib.p.cmxa; \
+-	  ln -s stdlib.cmxa $(INSTALL_LIBDIR)/stdlib.p.cmxa
+-	rm -f $(INSTALL_LIBDIR)/stdlib.p.a; \
+-	  ln -s stdlib.a $(INSTALL_LIBDIR)/stdlib.p.a
+-	rm -f $(INSTALL_LIBDIR)/std_exit.p.cmx; \
+-	  ln -s std_exit.cmx $(INSTALL_LIBDIR)/std_exit.p.cmx
+-	rm -f $(INSTALL_LIBDIR)/std_exit.p.o; \
+-	  ln -s std_exit.o $(INSTALL_LIBDIR)/std_exit.p.o
++	rm -f "$(INSTALL_LIBDIR)/stdlib.p.cmxa"; \
++	  ln -s stdlib.cmxa "$(INSTALL_LIBDIR)/stdlib.p.cmxa"
++	rm -f "$(INSTALL_LIBDIR)/stdlib.p.a"; \
++	  ln -s stdlib.a "$(INSTALL_LIBDIR)/stdlib.p.a"
++	rm -f "$(INSTALL_LIBDIR)/std_exit.p.cmx"; \
++	  ln -s std_exit.cmx "$(INSTALL_LIBDIR)/std_exit.p.cmx"
++	rm -f "$(INSTALL_LIBDIR)/std_exit.p.o"; \
++	  ln -s std_exit.o "$(INSTALL_LIBDIR)/std_exit.p.o"
+ 
+ installopt-prof:
+-	cp stdlib.p.cmxa stdlib.p.a std_exit.p.cmx std_exit.p.o $(INSTALL_LIBDIR)
+-	cd $(INSTALL_LIBDIR); $(RANLIB) stdlib.p.a
++	cp stdlib.p.cmxa stdlib.p.a std_exit.p.cmx std_exit.p.o \
++	  "$(INSTALL_LIBDIR)"
++	cd "$(INSTALL_LIBDIR)"; $(RANLIB) stdlib.p.a
+ 
+ stdlib.p.cmxa: $(OBJS:.cmo=.p.cmx)
+ 	$(CAMLOPT) -a -o stdlib.p.cmxa $(OBJS:.cmo=.p.cmx)
+diff --git a/stdlib/Makefile.nt b/stdlib/Makefile.nt
+index 5bc2e0e..af79294 100644
+--- a/stdlib/Makefile.nt
++++ b/stdlib/Makefile.nt
+@@ -16,7 +16,7 @@ include Makefile.shared
+ allopt: stdlib.cmxa std_exit.cmx
+ 
+ installopt:
+-	cp stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx $(INSTALL_LIBDIR)
++	cp stdlib.cmxa stdlib.$(A) std_exit.$(O) *.cmx "$(INSTALL_LIBDIR)"
+ 
+ camlheader target_camlheader camlheader_ur: headernt.c ../config/Makefile
+ 	$(BYTECC) $(BYTECCCOMPOPTS) -c -I../byterun \
+diff --git a/stdlib/Makefile.shared b/stdlib/Makefile.shared
+index e6b81c9..6a759f0 100755
+--- a/stdlib/Makefile.shared
++++ b/stdlib/Makefile.shared
+@@ -48,14 +48,14 @@ INSTALL_LIBDIR=$(DESTDIR)$(LIBDIR)
+ install: install-$(RUNTIMED)
+ 	cp stdlib.cma std_exit.cmo *.cmi *.cmt *.cmti *.mli *.ml \
+ 	  camlheader_ur \
+-	  $(INSTALL_LIBDIR)
+-	cp target_camlheader $(INSTALL_LIBDIR)/camlheader
++	  "$(INSTALL_LIBDIR)"
++	cp target_camlheader "$(INSTALL_LIBDIR)/camlheader"
+ 
+ install-noruntimed:
+ .PHONY: install-noruntimed
+ 
+ install-runtimed: target_camlheaderd
+-	cp target_camlheaderd $(INSTALL_LIBDIR)/camlheaderd
++	cp target_camlheaderd "$(INSTALL_LIBDIR)/camlheaderd"
+ .PHONY: install-runtimed
+ 
+ stdlib.cma: $(OBJS)
+diff --git a/tools/Makefile b/tools/Makefile
+index b5cc101..242b91d 100644
+--- a/tools/Makefile
++++ b/tools/Makefile
+@@ -19,7 +19,7 @@ ocamlmktop: ocamlmktop.tpl ../config/Makefile
+ 	chmod +x ocamlmktop
+ 
+ install::
+-	cp ocamlmktop $(INSTALL_BINDIR)
++	cp ocamlmktop "$(INSTALL_BINDIR)"
+ 
+ clean::
+ 	rm -f ocamlmktop
+diff --git a/tools/Makefile.nt b/tools/Makefile.nt
+index ed9b359..66d8d1f 100644
+--- a/tools/Makefile.nt
++++ b/tools/Makefile.nt
+@@ -21,7 +21,7 @@ ocamlmktop: $(OCAMLMKTOP)
+ 	$(CAMLC) $(LINKFLAGS) -o ocamlmktop $(OCAMLMKTOP_IMPORTS) $(OCAMLMKTOP)
+ 
+ install::
+-	cp ocamlmktop $(INSTALL_BINDIR)/ocamlmktop$(EXE)
++	cp ocamlmktop "$(INSTALL_BINDIR)/ocamlmktop$(EXE)"
+ 
+ clean::
+ 	rm -f ocamlmktop$(EXE)
+diff --git a/tools/Makefile.shared b/tools/Makefile.shared
+index c4a56e5..0fd2fa8 100644
+--- a/tools/Makefile.shared
++++ b/tools/Makefile.shared
+@@ -58,9 +58,9 @@ INSTALL_BINDIR=$(DESTDIR)$(BINDIR)
+ INSTALL_LIBDIR=$(DESTDIR)$(LIBDIR)
+ 
+ install::
+-	cp ocamldep $(INSTALL_BINDIR)/ocamldep$(EXE)
+-	if test -f ocamldep.opt; \
+-	  then cp ocamldep.opt $(INSTALL_BINDIR)/ocamldep.opt$(EXE); else :; fi
++	cp ocamldep "$(INSTALL_BINDIR)/ocamldep$(EXE)"
++	if test -f ocamldep.opt; then \
++	  cp ocamldep.opt "$(INSTALL_BINDIR)/ocamldep.opt$(EXE)"; else :; fi
+ 
+ # The profiler
+ 
+@@ -82,13 +82,13 @@ ocamloptp: ocamloptp.cmo
+ opt:: profiling.cmx
+ 
+ install::
+-	cp ocamlprof $(INSTALL_BINDIR)/ocamlprof$(EXE)
+-	cp ocamlcp $(INSTALL_BINDIR)/ocamlcp$(EXE)
+-	cp ocamloptp $(INSTALL_BINDIR)/ocamloptp$(EXE)
+-	cp profiling.cmi profiling.cmo $(INSTALL_LIBDIR)
++	cp ocamlprof "$(INSTALL_BINDIR)/ocamlprof$(EXE)"
++	cp ocamlcp "$(INSTALL_BINDIR)/ocamlcp$(EXE)"
++	cp ocamloptp "$(INSTALL_BINDIR)/ocamloptp$(EXE)"
++	cp profiling.cmi profiling.cmo "$(INSTALL_LIBDIR)"
+ 
+ installopt::
+-	cp profiling.cmx profiling.$(O) $(INSTALL_LIBDIR)
++	cp profiling.cmx profiling.$(O) "$(INSTALL_LIBDIR)"
+ 
+ clean::
+ 	rm -f ocamlprof ocamlcp ocamloptp
+@@ -100,7 +100,7 @@ ocamlmklib: ocamlmklibconfig.cmo ocamlmklib.cmo
+ 	$(CAMLC) $(LINKFLAGS) -o ocamlmklib ocamlmklibconfig.cmo ocamlmklib.cmo
+ 
+ install::
+-	cp ocamlmklib $(INSTALL_BINDIR)/ocamlmklib$(EXE)
++	cp ocamlmklib "$(INSTALL_BINDIR)/ocamlmklib$(EXE)"
+ 
+ clean::
+ 	rm -f ocamlmklib
+@@ -135,7 +135,7 @@ lexer299.ml: lexer299.mll
+ 	$(CAMLLEX) lexer299.mll
+ 
+ #install::
+-#	cp ocaml299to3 $(INSTALL_BINDIR)/ocaml299to3$(EXE)
++#	cp ocaml299to3 "$(INSTALL_BINDIR)/ocaml299to3$(EXE)"
+ 
+ clean::
+ 	rm -f ocaml299to3 lexer299.ml
+@@ -151,7 +151,7 @@ lexer301.ml: lexer301.mll
+ 	$(CAMLLEX) lexer301.mll
+ 
+ #install::
+-#	cp scrapelabels $(INSTALL_LIBDIR)
++#	cp scrapelabels "$(INSTALL_LIBDIR)"
+ 
+ clean::
+ 	rm -f scrapelabels lexer301.ml
+@@ -167,7 +167,7 @@ addlabels: addlabels.cmo
+ 		$(ADDLABELS_IMPORTS) addlabels.cmo
+ 
+ #install::
+-#	cp addlabels $(INSTALL_LIBDIR)
++#	cp addlabels "$(INSTALL_LIBDIR)"
+ 
+ clean::
+ 	rm -f addlabels
+@@ -231,7 +231,7 @@ opnames.ml: ../byterun/caml/instruct.h
+ 	unset LC_ALL || : ; \
+ 	unset LC_CTYPE || : ; \
+ 	unset LC_COLLATE LANG || : ; \
+-	sed -e '/\/\*/d' \
++	sed -e '/[/][*]/d' \
+ 	    -e '/^#/d' \
+ 	    -e 's/enum \(.*\) {/let names_of_\1 = [|/' \
+ 	    -e 's/.*};$$/ |]/' \
+@@ -272,8 +272,8 @@ objinfo: objinfo_helper$(EXE) $(OBJINFO)
+ 	$(CAMLC) -o objinfo $(OBJINFO)
+ 
+ install::
+-	cp objinfo $(INSTALL_BINDIR)/ocamlobjinfo$(EXE)
+-	cp objinfo_helper$(EXE) $(INSTALL_LIBDIR)/objinfo_helper$(EXE)
++	cp objinfo "$(INSTALL_BINDIR)/ocamlobjinfo$(EXE)"
++	cp objinfo_helper$(EXE) "$(INSTALL_LIBDIR)/objinfo_helper$(EXE)"
+ 
+ clean::
+ 	rm -f objinfo objinfo_helper$(EXE)
+-- 
+2.6.2
+

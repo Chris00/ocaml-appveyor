@@ -1,0 +1,55 @@
+# This compiles a native Windows OCaml and flexdll and makes them
+# available as an artifact.
+
+# Compile the 64 bits version
+platform:
+  - x64
+
+# Use 'unstable' build worker image as it contains Cygwin
+os: Unstable
+
+environment:
+  global:
+    CYG_ROOT: C:/cygwin
+    CYG_MIRROR: http://mirrors.kernel.org/sourceware/cygwin/
+    CYG_CACHE: C:/cygwin/var/cache/setup
+    OCAMLROOT: "%PROGRAMFILES%/OCaml"
+    OCAMLBRANCH: 4.02
+
+cache:
+  - C:\cygwin\var\cache\setup
+
+install:
+  - mkdir "%OCAMLROOT%"
+  - mkdir "%OCAMLROOT%/bin"
+  - mkdir "%OCAMLROOT%/bin/flexdll"
+  - set Path=%OCAMLROOT%\bin;%OCAMLROOT%\bin\flexdll;%Path%
+  - appveyor DownloadFile "http://alain.frisch.fr/flexdll/flexdll-bin-0.34.zip" -FileName "flexdll.zip"
+  - cinst 7zip.commandline -x86
+  - 7za x -y flexdll.zip
+  - for %%F in (*.c *.h *.exe *.o *.obj) do copy %%F "%OCAMLROOT%\bin\flexdll"
+  - '"%CYG_ROOT%\setup-x86.exe" -qnNdO -R "%CYG_ROOT%" -s "%CYG_MIRROR%" -l "%CYG_CACHE%" -P diffutils -P dos2unix -P gcc-core -P make -P ncurses >NUL'
+  - '%CYG_ROOT%\bin\bash -lc "cygcheck -dc cygwin"'
+
+build_script:
+  - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
+  - set PFPATH=%PROGRAMFILES%
+  - set FLEXDLLDIR=%OCAMLROOT%\bin\flexdll
+  - echo VCPATH="`cygpath -p '%Path%'`" >C:\cygwin\tmp\msenv
+  - echo LIB="%LIB%" >>C:\cygwin\tmp\msenv
+  - echo LIBPATH="%LIBPATH%" >>C:\cygwin\tmp\msenv                 
+  - echo INCLUDE="%INCLUDE%;%FLEXDLLDIR%" >>C:\cygwin\tmp\msenv    
+  - echo FLPATH="`cygpath '%FLEXDLLDIR%'`" >>C:\cygwin\tmp\msenv
+  - echo PATH="$VCPATH:$FLPATH:$PATH" >>C:\cygwin\tmp\msenv        
+  - echo export PATH LIB LIBPATH INCLUDE >>C:\cygwin\tmp\msenv     
+  - echo export OCAMLBUILD_FIND=/usr/bin/find >>C:\cygwin\tmp\msenv
+  - "%CYG_ROOT%/bin/bash -lc \"tr -d '\\r' </tmp/msenv > ~/.msenv64\""
+  - "%CYG_ROOT%/bin/bash -lc \"echo '. ~/.msenv64' >> ~/.bash_profile\""
+  - '%CYG_ROOT%/bin/bash -lc "$APPVEYOR_BUILD_FOLDER/build_ocaml.sh"'
+
+after_build:
+  - 7za a ocaml-%OCAMLBRANCH%.zip "%OCAMLROOT%"
+
+artifacts:
+  - path: ocaml-$(OCAMLBRANCH).zip
+    name: OCaml

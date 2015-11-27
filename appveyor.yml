@@ -8,6 +8,10 @@ platform:
 # Use 'unstable' build worker image as it contains Cygwin
 os: Unstable
 
+branches:
+  only:
+    - master
+
 environment:
   global:
     CYG_ROOT: C:/cygwin

@@ -1,0 +1,25 @@
+From a667475cbd894fb1ab872d469b975e1b56ca3d12 Mon Sep 17 00:00:00 2001
+From: Christophe Troestler <Christophe.Troestler@umons.ac.be>
+Date: Sat, 28 Nov 2015 19:16:19 +0100
+Subject: [PATCH] X
+Content-Type: text/plain; charset="utf-8"
+
+---
+ shell/md5check.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/shell/md5check.ml b/shell/md5check.ml
+index 15e7d59..17d3664 100644
+--- a/shell/md5check.ml
++++ b/shell/md5check.ml
+@@ -15,6 +15,6 @@ let () =
+       \  expected: %s\n\
+       \    actual: %s\n"
+       file md5 md5_of_file;
+-    Sys.remove file
++    (* Sys.remove file *)
+   ) else
+     Printf.printf "%s has the expected MD5.\n" file
+-- 
+2.6.2
+

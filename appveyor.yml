@@ -19,6 +19,7 @@ environment:
     CYG_CACHE: C:/cygwin/var/cache/setup
     OCAMLROOT: "%PROGRAMFILES%/OCaml"
     OCAMLBRANCH: 4.02
+#    BUILDOPAM: True
 
 cache:
   - C:\cygwin\var\cache\setup
@@ -41,11 +42,11 @@ build_script:
   - set FLEXDLLDIR=%OCAMLROOT%\bin\flexdll
   - echo VCPATH="`cygpath -p '%Path%'`" >C:\cygwin\tmp\msenv
   - echo LIB="%LIB%" >>C:\cygwin\tmp\msenv
-  - echo LIBPATH="%LIBPATH%" >>C:\cygwin\tmp\msenv                 
-  - echo INCLUDE="%INCLUDE%;%FLEXDLLDIR%" >>C:\cygwin\tmp\msenv    
+  - echo LIBPATH="%LIBPATH%" >>C:\cygwin\tmp\msenv
+  - echo INCLUDE="%INCLUDE%;%FLEXDLLDIR%" >>C:\cygwin\tmp\msenv
   - echo FLPATH="`cygpath '%FLEXDLLDIR%'`" >>C:\cygwin\tmp\msenv
-  - echo PATH="$VCPATH:$FLPATH:$PATH" >>C:\cygwin\tmp\msenv        
-  - echo export PATH LIB LIBPATH INCLUDE >>C:\cygwin\tmp\msenv     
+  - echo PATH="$VCPATH:$FLPATH:$PATH" >>C:\cygwin\tmp\msenv
+  - echo export PATH LIB LIBPATH INCLUDE >>C:\cygwin\tmp\msenv
   - echo export OCAMLBUILD_FIND=/usr/bin/find >>C:\cygwin\tmp\msenv
   - "%CYG_ROOT%/bin/bash -lc \"tr -d '\\r' </tmp/msenv > ~/.msenv64\""
   - "%CYG_ROOT%/bin/bash -lc \"echo '. ~/.msenv64' >> ~/.bash_profile\""

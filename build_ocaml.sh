@@ -4,7 +4,7 @@ function run {
     NAME=$1
     shift
     echo "-=-=- $NAME -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    $@
+    "$@"
     CODE=$?
     if [ $CODE -ne 0 ]; then
         echo "-=-=- $NAME failed! -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
@@ -31,11 +31,11 @@ cp config/s-nt.h config/s.h
 #cp config/Makefile.msvc config/Makefile
 cp config/Makefile.msvc64 config/Makefile
 
-PREFIX=$(echo "$OCAMLROOT" | sed -e "s|\\\\|/|")
+PREFIX=$(echo "$OCAMLROOT" | sed -e "s|\\\\|/|g")
 echo "Edit config/Makefile so set PREFIX=$PREFIX"
 cp config/Makefile config/Makefile.bak
 sed -e "s|PREFIX=.*|PREFIX=$PREFIX|" config/Makefile.bak > config/Makefile
-#run "Content of config/Makefile" cat config/Makefile
+run "Content of config/Makefile" cat config/Makefile
 
 run "make world" make -f Makefile.nt world
 run "make bootstrap" make -f Makefile.nt bootstrap
@@ -43,6 +43,8 @@ run "make opt" make -f Makefile.nt opt
 run "make opt.opt" make -f Makefile.nt opt.opt
 run "make install" make -f Makefile.nt install
 
+#run "env" env
+export CAML_LD_LIBRARY_PATH=$PREFIX/lib/stublibs
 
 cd $APPVEYOR_BUILD_FOLDER
 
@@ -68,4 +70,32 @@ if [ -n "$BUILDOPAM" ]; then
     cp src/opam-admin "$PREFIX/bin/opam-admin.exe"
     cp src/opam-admin.top "$PREFIX/bin/opam-admin-top.exe"
     cp src/opam-installer "$PREFIX/bin/opam-installer.exe"
+fi
+
+if [ -n "$OCAMLFIND_VERSION" ]; then
+    cd $APPVEYOR_BUILD_FOLDER
+
+    echo "Build ocamlfind..."
+    appveyor DownloadFile "http://download.camlcity.org/download/findlib-${OCAMLFIND_VERSION}.tar.gz"
+    tar xvf findlib-${OCAMLFIND_VERSION}.tar.gz
+    cd findlib-${OCAMLFIND_VERSION}
+    ROOT=$(cygpath -m "$PREFIX")
+    ROOT=$(cygpath -u "$ROOT")
+    # Man path not protected against spaces:
+    BINDIR="$ROOT/bin"
+    SITELIB="$ROOT/lib/site-lib"
+    MANDIR="$ROOT/man"
+    CONFIG="$ROOT/etc/findlib.conf"
+    echo "bindir =$BINDIR"
+    echo "sitelib=$SITELIB"
+    echo "mandir =$MANDIR"
+    ./configure -bindir "$BINDIR" -sitelib "$SITELIB" -mandir "$MANDIR" \
+                -config "$CONFIG"
+    run "Makefile.config" cat Makefile.config
+    run "Build ocamlfind (byte)" make all
+    run "Build ocamlfind (native)" make opt
+    run "Install ocamlfind" make install
+    # Small test:
+    run "Content of $CONFIG" cat "$CONFIG"
+    run "ocamlfind printconf" ocamlfind printconf || true
 fi

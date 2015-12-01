@@ -1,5 +1,8 @@
 REM Download and install OCaml and flexlink (unless it was already done).
 REM Prepare the environment variables,... to use it.
+REM
+REM If you are using Cygwin, install it in C:\cygwin first and then
+REM execute this script.
 
 set OCAMLROOT=%PROGRAMFILES%/OCaml
 
@@ -17,7 +20,15 @@ if not exist "%OCAMLROOT%/bin/ocaml.exe" (
 
 call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
 
-REM Add OCaml to the path & make sure that "link" is the MSVC one and
-REM not the shell one.
-set Path=%OCAMLROOT%\bin;%OCAMLROOT%\bin\flexdll;%VCPATH%;%FLPATH%;%Path%
+set Path=%OCAMLROOT%\bin;%OCAMLROOT%\bin\flexdll;%Path%
 set CAML_LD_LIBRARY_PATH=%OCAMLROOT%/lib/stublibs
+
+set CYGWINBASH=C:\cygwin\bin\bash.exe
+
+if exist %CYGWINBASH% (
+  REM Make sure that "link" is the MSVC one and not the Cynwin one.
+  echo VCPATH="`cygpath -p '%Path%'`" > C:\cygwin\tmp\msenv
+  echo PATH="$VCPATH:$PATH" >> C:\cygwin\tmp\msenv
+  %CYGWINBASH% -lc "tr -d '\\r' </tmp/msenv > ~/.msenv64"
+  %CYGWINBASH% -lc "echo '. ~/.msenv64' >> ~/.bash_profile"
+)

@@ -32,3 +32,5 @@ if exist %CYGWINBASH% (
   %CYGWINBASH% -lc "tr -d '\\r' </tmp/msenv > ~/.msenv64"
   %CYGWINBASH% -lc "echo '. ~/.msenv64' >> ~/.bash_profile"
 )
+
+set <NUL /p=Ready to use OCaml & ocamlc -version

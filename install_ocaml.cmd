@@ -19,6 +19,10 @@ if not exist "%OCAMLROOT%/bin/ocaml.exe" (
   del %temp%\ocaml.zip
 )
 
+REM Cygwin is always installed on AppVeyor.  Its path must come
+REM before the one of Git but after those of MSCV and OCaml.
+set Path=C:\cygwin\bin;%Path%
+
 call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
 
 set Path=%OCAMLROOT%\bin;%OCAMLROOT%\bin\flexdll;%Path%
@@ -33,7 +37,7 @@ if exist %CYGWINBASH% (
   %CYGWINBASH% -lc "tr -d '\\r' </tmp/msenv > ~/.msenv64"
   %CYGWINBASH% -lc "echo '. ~/.msenv64' >> ~/.bash_profile"
   REM Make OCAMLROOT available in Unix form:
-  echo OCAMLROOT_WIN="`cygpath -m '%OCAMLROOT%'`" > C:\cygwin\tmp\env
+  echo OCAMLROOT_WIN="`cygpath -w -s '%OCAMLROOT%'`" > C:\cygwin\tmp\env
   (echo OCAMLROOT="`cygpath -u \"$OCAMLROOT_WIN\"`") >>C:\cygwin\tmp\env
   echo export OCAMLROOT_WIN OCAMLROOT >>C:\cygwin\tmp\env
   %CYGWINBASH% -lc "tr -d '\\r' </tmp/env >> ~/.bash_profile"

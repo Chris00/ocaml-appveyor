@@ -31,7 +31,8 @@ cp config/s-nt.h config/s.h
 #cp config/Makefile.msvc config/Makefile
 cp config/Makefile.msvc64 config/Makefile
 
-PREFIX=$(echo "$OCAMLROOT" | sed -e "s|\\\\|/|g")
+#PREFIX=$(echo "$OCAMLROOT" | sed -e "s|\\\\|/|g")
+PREFIX=$(cygpath -m -s "$OCAMLROOT")
 echo "Edit config/Makefile so set PREFIX=$PREFIX"
 cp config/Makefile config/Makefile.bak
 sed -e "s|PREFIX=.*|PREFIX=$PREFIX|" config/Makefile.bak > config/Makefile

@@ -5,7 +5,8 @@ REM
 REM If you are using Cygwin, install it in C:\cygwin first and then
 REM execute this script.  Execute bash with the option "-l".
 
-set OCAMLROOT=%PROGRAMFILES%/OCaml
+REM set OCAMLROOT=%PROGRAMFILES%/OCaml
+set OCAMLROOT=C:/PROGRA~1/OCaml
 
 set OCAMLURL=https://github.com/Chris00/ocaml-appveyor/releases/download/0.1/ocaml-4.02.zip
 

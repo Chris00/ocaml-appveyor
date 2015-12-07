@@ -11,6 +11,9 @@ open Printf
 
 let build_folder = Sys.getenv "APPVEYOR_BUILD_FOLDER"
 
+let ocamlroot = try Sys.getenv "OCAMLROOT"
+                with _ -> "C:/PROGRA~1/OCaml"
+
 let runf fmt =
   let exec cmd =
     printf "▸▸▸ %s\n%!" cmd;
@@ -41,7 +44,7 @@ let install pkg_url =
               exit 1
    | [| d |] when Sys.is_directory d -> Sys.chdir d
    | _ -> ());
-  runf "ocaml setup.ml -configure";
+  runf "ocaml setup.ml -configure --prefix %s" (Filename.quote ocamlroot);
   runf "ocaml setup.ml -build";
   runf "ocaml setup.ml -install";
   printf "-=-=- Done installing %s -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n"

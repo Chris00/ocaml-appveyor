@@ -23,8 +23,13 @@ git clone https://github.com/ocaml/ocaml.git --branch $OCAMLBRANCH \
 
 cd ocaml
 
-run "Apply patch to OCaml sources" \
-    patch -p1 < $APPVEYOR_BUILD_FOLDER/ocaml.patch
+OCAMLBRANCH_MAJOR=`echo "$OCAMLBRANCH" | sed -s 's/\([0-9]\+\).*/\1/'`
+OCAMLBRANCH_MINOR=`echo "$OCAMLBRANCH" | sed -s 's/[0-9]\+\.\([0-9]\+\).*/\1/'`
+if [[ ($OCAMLBRANCH_MAJOR -eq 4 && $OCAMLBRANCH_MINOR -lt 3) \
+	  || $OCAMLBRANCH_MAJOR -lt 4 ]]; then
+    run "Apply patch to OCaml sources (quote paths)" \
+	patch -p1 < $APPVEYOR_BUILD_FOLDER/ocaml.patch
+fi
 
 cp config/m-nt.h config/m.h
 cp config/s-nt.h config/s.h

@@ -16,10 +16,10 @@ let ocamlroot = try Sys.getenv "OCAMLROOT"
 
 let runf fmt =
   let exec cmd =
-    printf "▸▸▸ %s\n%!" cmd;
+    printf "\027[32m▸▸▸ %s\027[0m\n%!" cmd;
     let code = Sys.command cmd in
     if code <> 0 then (
-      eprintf "⚠ Command “%s” failed with code %d\n" cmd code;
+      eprintf "\027[31m⚠ Command “%s” failed with code %d\027[0m\n" cmd code;
       exit code
     ) in
   ksprintf exec fmt
@@ -32,7 +32,8 @@ let mk_temp_dir () =
 
 let install pkg_url =
   let fname = Filename.basename pkg_url in
-  printf "-=-=- Installing %s -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n" fname;
+  printf "\027[36m-=-=- Installing %s -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\
+          \027[0m\n" fname;
   (* Work in an empty directory so the tarball expansion is the only
      content. *)
   Sys.chdir (mk_temp_dir());
@@ -47,8 +48,8 @@ let install pkg_url =
   runf "ocaml setup.ml -configure --prefix %s" (Filename.quote ocamlroot);
   runf "ocaml setup.ml -build";
   runf "ocaml setup.ml -install";
-  printf "-=-=- Done installing %s -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n"
-         fname
+  printf "\027[34m-=-=- Done installing %s -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\
+          \027[0m\n" fname
 
 
 let () =

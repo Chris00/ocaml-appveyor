@@ -17,7 +17,8 @@ environment:
     OCAMLROOT: "%PROGRAMFILES%/OCaml"
     OCAMLBRANCH: 4.03
     OCAMLFIND_VERSION: 1.5.6
-#    BUILDOPAM: True
+#    INSTALLOPAM: True
+    INSTALL_OASIS: True
 
 cache:
   - C:\cygwin\var\cache\setup

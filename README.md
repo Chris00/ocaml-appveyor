@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/hexo6yrftl8cb0og?svg=true)](https://ci.appveyor.com/project/Chris00/ocaml-appveyor)
+
 Use native Windows OCaml on AppVeyor
 ====================================
 

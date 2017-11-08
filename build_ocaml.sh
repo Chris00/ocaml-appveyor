@@ -92,7 +92,7 @@ if [ -n "$OCAMLFIND_VERSION" ]; then
     tar xvf findlib-${OCAMLFIND_VERSION}.tar.gz
     cd findlib-${OCAMLFIND_VERSION}
     ROOT=$(cygpath -m "$PREFIX")
-    ROOT=$(cygpath -u "$ROOT")
+    #ROOT=$(cygpath -u "$ROOT")
     # Man path not protected against spaces:
     BINDIR="$ROOT/bin"
     SITELIB="$ROOT/lib/site-lib"
@@ -109,7 +109,7 @@ if [ -n "$OCAMLFIND_VERSION" ]; then
     run "Install ocamlfind" make install
     # Small test:
     run "Content of $CONFIG" cat "$CONFIG"
-    run "ocamlfind printconf" ocamlfind printconf || true
+    run "ocamlfind printconf" ocamlfind printconf
 
     echo "-=-=- ocamlfind installed -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 fi

@@ -17,31 +17,40 @@ function run {
 cd $APPVEYOR_BUILD_FOLDER
 
 # Do not perform end-of-line conversion
+echo "Clone OCaml branch $OCAMLBRANCH"
 git config --global core.autocrlf false
 git clone https://github.com/ocaml/ocaml.git --branch $OCAMLBRANCH \
     --depth 1 ocaml
 
 cd ocaml
 
+#PREFIX=$(echo "$OCAMLROOT" | sed -e "s|\\\\|/|g")
+PREFIX=$(cygpath -m -s "$OCAMLROOT")
+
 OCAMLBRANCH_MAJOR=`echo "$OCAMLBRANCH" | sed -s 's/\([0-9]\+\).*/\1/'`
 OCAMLBRANCH_MINOR=`echo "$OCAMLBRANCH" | sed -s 's/[0-9]\+\.\([0-9]\+\).*/\1/'`
-if [[ ($OCAMLBRANCH_MAJOR -eq 4 && $OCAMLBRANCH_MINOR -lt 3) \
-	  || $OCAMLBRANCH_MAJOR -lt 4 ]]; then
+if [[ "$OCAMLBRANCH" != "trunk" \
+	  && (($OCAMLBRANCH_MAJOR -eq 4 && $OCAMLBRANCH_MINOR -lt 3) \
+		  || $OCAMLBRANCH_MAJOR -lt 4) ]]; then
     run "Apply patch to OCaml sources (quote paths)" \
 	patch -p1 < $APPVEYOR_BUILD_FOLDER/ocaml.patch
 fi
 
-cp config/m-nt.h config/m.h
-cp config/s-nt.h config/s.h
-#cp config/Makefile.msvc config/Makefile
-cp config/Makefile.msvc64 config/Makefile
-
-#PREFIX=$(echo "$OCAMLROOT" | sed -e "s|\\\\|/|g")
-PREFIX=$(cygpath -m -s "$OCAMLROOT")
-echo "Edit config/Makefile so set PREFIX=$PREFIX"
-cp config/Makefile config/Makefile.bak
-sed -e "s|PREFIX=.*|PREFIX=$PREFIX|" config/Makefile.bak > config/Makefile
+if [[ "$OCAMLBRANCH" != "trunk" \
+	  && (($OCAMLBRANCH_MAJOR -eq 4 && $OCAMLBRANCH_MINOR -lt 5) \
+		  || $OCAMLBRANCH_MAJOR -lt 4) ]]; then
+    cp config/m-nt.h config/m.h
+    cp config/s-nt.h config/s.h
+else
+    cp config/m-nt.h byterun/caml/m.h
+    cp config/s-nt.h byterun/caml/s.h
+fi
+echo "Edit config/Makefile.msvc64 to set PREFIX=$PREFIX"
+sed -e "/PREFIX=/s|=.*|=$PREFIX|" \
+    -e "/^ *CFLAGS *=/s/\r\?$/ -WX\0/" \
+    config/Makefile.msvc64 > config/Makefile
 run "Content of config/Makefile" cat config/Makefile
+
 
 run "make world" make -f Makefile.nt world
 run "make bootstrap" make -f Makefile.nt bootstrap

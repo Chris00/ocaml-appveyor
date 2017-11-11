@@ -15,7 +15,7 @@ environment:
     CYG_MIRROR: http://mirrors.kernel.org/sourceware/cygwin/
     CYG_CACHE: C:/cygwin/var/cache/setup
     OCAMLROOT: "%PROGRAMFILES%/OCaml"
-    OCAMLBRANCH: 4.05
+    OCAMLBRANCH: 4.06
     OCAMLFIND_VERSION: 1.7.3
     INSTALL_JBUILDER: True
     INSTALL_OCAMLBUILD: True
@@ -29,7 +29,7 @@ install:
   - mkdir "%OCAMLROOT%"
   - mkdir "%OCAMLROOT%/bin"
   - mkdir "%OCAMLROOT%/bin/flexdll"
-  - appveyor DownloadFile "http://alain.frisch.fr/flexdll/flexdll-bin-0.35.zip" -FileName "flexdll.zip"
+  - appveyor DownloadFile "https://github.com/alainfrisch/flexdll/releases/download/0.37/flexdll-bin-0.37.zip" -FileName "flexdll.zip"
   - cinst 7zip.commandline
   - 7za x -y flexdll.zip
   - for %%F in (*.c *.h *.exe *.o *.obj) do copy %%F "%OCAMLROOT%\bin\flexdll"

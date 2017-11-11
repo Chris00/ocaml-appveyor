@@ -111,24 +111,19 @@ if [ -n "$INSTALL_OPAM" ]; then
     run "Configure OPAM with --prefix=$OPAM_INSTALL" \
         env DJDIR=workaround ./configure --prefix="$OPAM_INSTALL"
 
-    # The dose 3 tarball contains a symlink which causes problems with tar:
-    #patch -p1 < $APPVEYOR_BUILD_FOLDER/opam.patch
-    #appveyor DownloadFile "https://github.com/Chris00/ocaml-appveyor/releases/download/0.1/dose.3.3.opam.tar.gz" -FileName "src_ext/dose.3.3+opam.tar.gz"
-
     run "Build external libraries" make lib-ext
     run "Build OPAM" make
     ./src/opam --version  # minimal test
-    if [ -n "$INSTALL_OPAM" ]; then
-	#run "Install OPAM" make install
-	# ls "$OPAM_INSTALL"
-	# mv "$OPAM_INSTALL"/* "$PREFIX/"
-	# Install by hand, the above installation procedure fails on
-	# Cygwin/Mingw
-	cp src/opam "$PREFIX/bin/opam.exe"
-	cp src/opam-admin "$PREFIX/bin/opam-admin.exe"
-	cp src/opam-admin.top "$PREFIX/bin/opam-admin-top.exe"
-	cp src/opam-installer "$PREFIX/bin/opam-installer.exe"
-    fi
+
+    #run "Install OPAM" make install
+    # ls "$OPAM_INSTALL"
+    # mv "$OPAM_INSTALL"/* "$PREFIX/"
+    # Install by hand, the above installation procedure fails on
+    # Cygwin/Mingw
+    cp src/opam "$PREFIX/bin/opam.exe"
+    cp src/opam-admin "$PREFIX/bin/opam-admin.exe"
+    cp src/opam-admin.top "$PREFIX/bin/opam-admin-top.exe"
+    cp src/opam-installer "$PREFIX/bin/opam-installer.exe"
 fi
 
 if [ -n "$INSTALL_OCAMLBUILD" ]; then

@@ -88,6 +88,19 @@ if [ -n "$OCAMLFIND_VERSION" ]; then
     echo "-=-=- ocamlfind installed -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 fi
 
+if [ -n "$INSTALL_JBUILDER" ]; then
+    cd $APPVEYOR_BUILD_FOLDER
+    #git clone https://github.com/janestreet/jbuilder.git --depth 1
+    git clone https://github.com/Chris00/jbuilder.git --depth 1 --branch=quote
+    cd jbuilder
+    ocaml bootstrap.ml
+    ./boot.exe --dev
+    # Install requires the opam-installer binary :-(
+    #_build/default/bin/main.exe install
+    cp _build/default/bin/main.exe $PREFIX/bin/jbuilder.exe
+    run "jbuilder version" jbuilder --version
+fi
+
 if [ -n "$INSTALL_OPAM" ]; then
     cd $APPVEYOR_BUILD_FOLDER
     echo

@@ -151,21 +151,24 @@ fi
 
 if [ -n "$INSTALL_OASIS" -a -n "$INSTALL_OCAMLBUILD" ]; then
     echo
-    wget https://github.com/ocaml/camlp4/archive/4.03+1.tar.gz
-    tar xf 4.03+1.tar.gz
-    cd camlp4-4.03-1
+    echo "-=-=- Install Camlp4 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    wget https://github.com/ocaml/camlp4/archive/4.05+2.tar.gz
+    tar xf 4.05+2.tar.gz
+    cd camlp4-4.05-2
     ./configure --bindir="$PREFIX/bin" --libdir="$PREFIX/lib/camlp4"
     make all
     make install
     cd ..
 
+    echo "-=-=- Install OASIS deps -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
     ocaml $APPVEYOR_BUILD_FOLDER/install_oasis_pkg.ml \
-	  https://forge.ocamlcore.org/frs/download.php/1544/ocamlmod-0.0.8.tar.gz \
+	  https://forge.ocamlcore.org/frs/download.php/1702/ocamlmod-0.0.9.tar.gz \
 	  https://ocaml.janestreet.com/ocaml-core/113.00/files/type_conv-113.00.02.tar.gz \
 	  https://forge.ocamlcore.org/frs/download.php/1310/ocaml-data-notation-0.0.11.tar.gz \
 	  http://forge.ocamlcore.org/frs/download.php/379/ocamlify-0.0.1.tar.gz
 
-    git clone https://github.com/Chris00/oasis.git
+    echo "-=-=- Install OASIS deps -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    git clone https://github.com/ocaml/oasis.git
     cd oasis
     ocaml setup.ml -configure --disable-tests --prefix "$PREFIX"
     ocaml setup.ml -build

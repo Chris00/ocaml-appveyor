@@ -8,10 +8,13 @@ REM execute this script.  Execute bash with the option "-l".
 REM set OCAMLROOT=%PROGRAMFILES%/OCaml
 set OCAMLROOT=C:/PROGRA~1/OCaml
 
-set OCAMLURL=https://github.com/Chris00/ocaml-appveyor/releases/download/0.1/ocaml-4.03.zip
+if not defined OCAML_BRANCH (set OCAML_BRANCH=4.05)
+set OCAMLURL=https://github.com/Chris00/ocaml-appveyor/releases/download/0.2/ocaml-4.05.zip
+if "%OCAML_BRANCH%" == "4.03" (set OCAMLURL=https://github.com/Chris00/ocaml-appveyor/releases/download/0.1/ocaml-4.03.zip)
+if "%OCAML_BRANCH%" == "4.02" (set OCAMLURL=https://github.com/Chris00/ocaml-appveyor/releases/download/0.1/ocaml-4.02.zip)
 
 if not exist "%OCAMLROOT%/bin/ocaml.exe" (
-  echo Downloading OCaml...
+  echo Downloading OCaml %OCAML_BRANCH% from "%OCAMLURL%"
   appveyor DownloadFile "%OCAMLURL%" -FileName "%temp%/ocaml.zip"
   REM Intall 7za using Chocolatey:
   choco install 7zip.commandline

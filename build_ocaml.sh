@@ -131,15 +131,24 @@ if [ -n "$INSTALL_OPAM" ]; then
     fi
 fi
 
-    wget https://github.com/ocaml/ocamlbuild/archive/0.9.2.tar.gz
-    tar xf 0.9.2.tar.gz
-    cd ocamlbuild-0.9.2
+if [ -n "$INSTALL_OCAMLBUILD" ]; then
+    cd $APPVEYOR_BUILD_FOLDER
+    echo
+    echo "-=-=- Install ocamlbuild -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    # wget https://github.com/ocaml/ocamlbuild/archive/0.11.0.tar.gz
+    # tar xf 0.11.0.tar.gz
+    # cd ocamlbuild-0.11.0
+    # See https://github.com/ocaml/ocamlbuild/issues/261
+    git clone https://github.com/ocaml/ocamlbuild.git --depth 1
+    cd ocamlbuild
     make configure
     make
-    make install
+    # https://github.com/ocaml/ocamlbuild/issues/261
+    run "Install ocamlbuild" make findlib-install
     cd ..
     run "ocamlbuild -where" ocamlbuild -where
-    
+fi
+
 if [ -n "$INSTALL_OASIS" -a -n "$INSTALL_OCAMLBUILD" ]; then
     echo
     wget https://github.com/ocaml/camlp4/archive/4.03+1.tar.gz

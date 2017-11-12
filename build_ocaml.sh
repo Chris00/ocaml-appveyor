@@ -121,18 +121,26 @@ if [ -n "$INSTALL_OPAM" ]; then
         env DJDIR=workaround ./configure --prefix="$OPAM_INSTALL"
 
     run "Build external libraries" make lib-ext
+    ls -lR
     run "Build OPAM" make
-    ./src/opam --version  # minimal test
 
-    #run "Install OPAM" make install
+    run "Install OPAM" make install
+    opam init -y -a
+    run "OPAM config" opam config env
     # ls "$OPAM_INSTALL"
     # mv "$OPAM_INSTALL"/* "$PREFIX/"
     # Install by hand, the above installation procedure fails on
     # Cygwin/Mingw
-    cp src/opam "$PREFIX/bin/opam.exe"
-    cp src/opam-admin "$PREFIX/bin/opam-admin.exe"
-    cp src/opam-admin.top "$PREFIX/bin/opam-admin-top.exe"
-    cp src/opam-installer "$PREFIX/bin/opam-installer.exe"
+    # cp src/opam "$PREFIX/bin/opam.exe"
+    # cp src/opam-admin "$PREFIX/bin/opam-admin.exe"
+    # cp src/opam-admin.top "$PREFIX/bin/opam-admin-top.exe"
+    # cp src/opam-installer "$PREFIX/bin/opam-installer.exe"
+    if [ -z "$OCAMLFIND_VERSION" ]; then
+	opam install -y -v ocamlfind
+    fi
+    if [ -z "$INSTALL_JBUILDER" ]; then
+	opam install -y -v jbuilder
+    fi
 fi
 
 if [ -n "$INSTALL_OCAMLBUILD" ]; then

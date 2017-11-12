@@ -17,9 +17,9 @@ environment:
     OCAMLROOT: "%PROGRAMFILES%/OCaml"
     OCAMLBRANCH: 4.06
     OCAMLFIND_VERSION: 1.7.3
-    INSTALL_JBUILDER: True
-    INSTALL_OCAMLBUILD: True
-    # INSTALL_OPAM: True
+    # INSTALL_JBUILDER: True
+    # INSTALL_OCAMLBUILD: True
+    INSTALL_OPAM: True
     # INSTALL_OASIS: True
 
 cache:
@@ -39,6 +39,8 @@ install:
   - '"%CYG_ROOT%\setup-x86.exe" -qnNdO -R "%CYG_ROOT%" -s "%CYG_MIRROR%" -l "%CYG_CACHE%" -P diffutils -P dos2unix -P gcc-core -P make -P ncurses >NUL'
   # For ocamlfind:
   - '"%CYG_ROOT%\setup-x86.exe" -qnNdO -R "%CYG_ROOT%" -s "%CYG_MIRROR%" -l "%CYG_CACHE%" -P m4 >NUL'
+  # For OPAM:
+  - '"%CYG_ROOT%\setup-x86.exe" -qnNdO -R "%CYG_ROOT%" -s "%CYG_MIRROR%" -l "%CYG_CACHE%" -P gcc-g++ >NUL'
   - '%CYG_ROOT%\bin\bash -lc "cygcheck -dc cygwin"'
   - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
   - set Path=%OCAMLROOT%\bin;%OCAMLROOT%\bin\flexdll;%Path%

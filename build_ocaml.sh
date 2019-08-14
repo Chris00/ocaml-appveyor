@@ -105,17 +105,18 @@ if [ -n "$OCAMLFIND_VERSION" ]; then
     echo "-=-=- ocamlfind installed -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 fi
 
-if [ -n "$INSTALL_JBUILDER" ]; then
+if [ -n "$INSTALL_DUNE" ]; then
     cd $APPVEYOR_BUILD_FOLDER
-    #git clone https://github.com/janestreet/jbuilder.git --depth 1
-    git clone https://github.com/Chris00/jbuilder.git --depth 1 --branch=quote
-    cd jbuilder
+    echo
+    echo "-=-=- Install Dune -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    #git clone https://github.com/ocaml/dune.git --depth 1 --branch=master
+    git clone https://github.com/Chris00/dune.git --depth 1 --branch=master
+    cd dune
     ocaml bootstrap.ml
-    ./boot.exe --dev
-    # Install requires the opam-installer binary :-(
-    #_build/default/bin/main.exe install
-    cp _build/default/bin/main.exe $PREFIX/bin/jbuilder.exe
-    run "jbuilder version" jbuilder --version
+    ./boot.exe
+    ./_boot/default/bin/main.exe build @install
+    ./_boot/default/bin/main.exe install dune --prefix $PREFIX
+    run "dune version" dune --version
 fi
 
 if [ -n "$INSTALL_OPAM" ]; then
@@ -146,8 +147,8 @@ if [ -n "$INSTALL_OPAM" ]; then
     if [ -z "$OCAMLFIND_VERSION" ]; then
 	opam install -y -v ocamlfind
     fi
-    if [ -z "$INSTALL_JBUILDER" ]; then
-	opam install -y -v jbuilder
+    if [ -z "$INSTALL_DUNE" ]; then
+	opam install -y -v dune
     fi
 fi
 

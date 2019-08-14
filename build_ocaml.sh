@@ -36,27 +36,35 @@ if [[ "$OCAMLBRANCH" != "trunk" \
 	patch -p1 < $APPVEYOR_BUILD_FOLDER/ocaml.patch
 fi
 
-if [[ "$OCAMLBRANCH" != "trunk" \
-	  && (($OCAMLBRANCH_MAJOR -eq 4 && $OCAMLBRANCH_MINOR -lt 5) \
-		  || $OCAMLBRANCH_MAJOR -lt 4) ]]; then
-    cp config/m-nt.h config/m.h
-    cp config/s-nt.h config/s.h
+if [[ ($OCAMLBRANCH_MAJOR -eq 4 && $OCAMLBRANCH_MINOR -lt 8)
+      || $OCAMLBRANCH_MAJOR -lt 4 ]]; then
+
+    if [[ "$OCAMLBRANCH" != "trunk" \
+	      && (($OCAMLBRANCH_MAJOR -eq 4 && $OCAMLBRANCH_MINOR -lt 5) \
+		      || $OCAMLBRANCH_MAJOR -lt 4) ]]; then
+	cp config/m-nt.h config/m.h
+	cp config/s-nt.h config/s.h
+    else
+	cp config/m-nt.h byterun/caml/m.h
+	cp config/s-nt.h byterun/caml/s.h
+    fi
+
+    echo "Edit config/Makefile.msvc64 to set PREFIX=$PREFIX"
+    sed -e "/PREFIX=/s|=.*|=$PREFIX|" \
+	-e "/^ *CFLAGS *=/s/\r\?$/ -WX\0/" \
+	config/Makefile.msvc64 > config/Makefile
+    run "Content of config/Makefile" cat config/Makefile
+
+    run "make world" make -f Makefile.nt world
+    run "make bootstrap" make -f Makefile.nt bootstrap
+    run "make opt" make -f Makefile.nt opt
+    run "make opt.opt" make -f Makefile.nt opt.opt
+    run "make install" make -f Makefile.nt install
 else
-    cp config/m-nt.h byterun/caml/m.h
-    cp config/s-nt.h byterun/caml/s.h
+    run "Configure" ./configure --build=x86_64-unknown-cygwin --host=x86_64-pc-windows
+    run "make world.opt" make world.opt
+    run "make install" make install
 fi
-echo "Edit config/Makefile.msvc64 to set PREFIX=$PREFIX"
-sed -e "/PREFIX=/s|=.*|=$PREFIX|" \
-    -e "/^ *CFLAGS *=/s/\r\?$/ -WX\0/" \
-    config/Makefile.msvc64 > config/Makefile
-run "Content of config/Makefile" cat config/Makefile
-
-
-run "make world" make -f Makefile.nt world
-run "make bootstrap" make -f Makefile.nt bootstrap
-run "make opt" make -f Makefile.nt opt
-run "make opt.opt" make -f Makefile.nt opt.opt
-run "make install" make -f Makefile.nt install
 
 run "OCaml config" ocamlc -config
 

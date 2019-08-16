@@ -17,9 +17,9 @@ environment:
     OCAMLROOT: "%PROGRAMFILES%/OCaml"
     OCAMLBRANCH: 4.06
     OCAMLFIND_VERSION: 1.7.3
-    INSTALL_DUNE: True
+    # INSTALL_OPAM: True
+    # INSTALL_DUNE: True
     # INSTALL_OCAMLBUILD: True
-    INSTALL_OPAM: True
     # INSTALL_OASIS: True
 
 cache:

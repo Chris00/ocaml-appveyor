@@ -124,13 +124,15 @@ if [ -n "$INSTALL_OPAM" ]; then
     echo
     echo "-=-=- Install OPAM -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
     git clone https://github.com/ocaml/opam.git --depth 1
+    #git clone https://github.com/Chris00/opam.git --depth 1
     cd opam
     OPAM_INSTALL="C:/opam"
+    chmod +x shell/msvs-detect
     run "Configure OPAM with --prefix=$OPAM_INSTALL" \
-        env DJDIR=workaround ./configure --prefix="$OPAM_INSTALL"
+        ./configure --prefix="$OPAM_INSTALL"
 
     run "Build external libraries" make lib-ext
-    ls -lR
+    #ls -lR
     run "Build OPAM" make
 
     run "Install OPAM" make install
@@ -149,6 +151,7 @@ if [ -n "$INSTALL_OPAM" ]; then
     fi
     if [ -z "$INSTALL_DUNE" ]; then
 	opam install -y -v dune
+	dune --version
     fi
 fi
 

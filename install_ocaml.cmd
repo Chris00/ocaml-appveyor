@@ -10,6 +10,7 @@ set OCAMLROOT=C:/PROGRA~1/OCaml
 
 if not defined OCAML_BRANCH (set OCAML_BRANCH=4.08)
 set OCAMLURL=https://github.com/Chris00/ocaml-appveyor/releases/download/0.2/ocaml-4.08.zip
+if "%OCAML_BRANCH%" == "4.07" (set OCAMLURL=https://github.com/Chris00/ocaml-appveyor/releases/download/0.2/ocaml-4.07.zip)
 if "%OCAML_BRANCH%" == "4.06" (set OCAMLURL=https://github.com/Chris00/ocaml-appveyor/releases/download/0.2/ocaml-4.06.zip)
 if "%OCAML_BRANCH%" == "4.05" (set OCAMLURL=https://github.com/Chris00/ocaml-appveyor/releases/download/0.2/ocaml-4.05.zip)
 if "%OCAML_BRANCH%" == "4.03" (set OCAMLURL=https://github.com/Chris00/ocaml-appveyor/releases/download/0.1/ocaml-4.03.zip)

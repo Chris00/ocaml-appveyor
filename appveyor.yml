@@ -16,7 +16,7 @@ environment:
     CYG_CACHE: C:/cygwin/var/cache/setup
     OCAMLROOT: "%PROGRAMFILES%/OCaml"
     OCAMLBRANCH: 4.08
-    OCAMLFIND_VERSION: 1.7.3
+    OCAMLFIND_VERSION: 1.8.1
     # INSTALL_OPAM: True
     # INSTALL_DUNE: True
     # INSTALL_OCAMLBUILD: True

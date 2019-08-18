@@ -61,7 +61,7 @@ if [[ ($OCAMLBRANCH_MAJOR -eq 4 && $OCAMLBRANCH_MINOR -lt 8)
     run "make opt.opt" make -f Makefile.nt opt.opt
     run "make install" make -f Makefile.nt install
 else
-    run "Configure" ./configure --build=x86_64-unknown-cygwin --host=x86_64-pc-windows
+    run "Configure" ./configure --build=x86_64-unknown-cygwin --host=x86_64-pc-windows --prefix="$PREFIX"
     run "make world.opt" make world.opt
     run "make install" make install
 fi

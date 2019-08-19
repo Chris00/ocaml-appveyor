@@ -31,11 +31,11 @@ environment variable `OCAML_BRANCH`:
 
 ```
 environment:
-  OCAML_BRANCH: 4.05
+  OCAML_BRANCH: 4.08
 ```
 
-Possible values are `4.02`, `4.03`, `4.05` (the default) and
-`4.06`.  You can of course test simultaneously for several of them,
+Possible values are `4.02`, `4.03`, `4.05`, `4.06`, and `4.08` (the default).
+You can of course test simultaneously for several of them,
 see e.g.  [this `appveyor.yml`
 file](https://github.com/Chris00/root1d/blob/master/appveyor.yml).
 
@@ -59,22 +59,8 @@ build_script:
 where `name` is replaced with the name of your package.
 
 
-Compile with oasis
-------------------
-
-**OASIS is only available with OCaml ≤ 4.03 at the moment.**
-
-To use
-[oasis](https://ocaml.org/learn/tutorials/setting_up_with_oasis.html),
-add:
-
-```
-build_script:
-  - cd "%APPVEYOR_BUILD_FOLDER%"
-  - ocaml setup.ml -configure --enable-tests --prefix "%OCAMLROOT%"
-  - ocaml setup.ml -build
-  - ocaml setup.ml -info -install
-```
+Install packages using oasis
+----------------------------
 
 Unfortunately, [opam](http://opam.ocaml.org/) does not yet work on
 native Windows.  As a transient measure, if your package depends on

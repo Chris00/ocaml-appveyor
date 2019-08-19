@@ -18,7 +18,7 @@ environment:
     OCAMLBRANCH: 4.07
     OCAMLFIND_VERSION: 1.8.1
     INSTALL_DUNE: True
-    INSTALL_OPAM: True
+    # INSTALL_OPAM: True
     # INSTALL_OCAMLBUILD: True
     # INSTALL_OASIS: True
 

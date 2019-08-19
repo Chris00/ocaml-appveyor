@@ -74,6 +74,21 @@ export CAML_LD_LIBRARY_PATH=$PREFIX/lib/stublibs
 
 cd $APPVEYOR_BUILD_FOLDER
 
+if [ -n "$INSTALL_DUNE" ]; then
+    cd $APPVEYOR_BUILD_FOLDER
+    echo
+    echo "-=-=- Install Dune -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+    #git clone https://github.com/ocaml/dune.git --depth 1 --branch=master
+    git clone https://github.com/Chris00/dune.git --depth 1 --branch=master
+    cd dune
+    ocaml bootstrap.ml
+    run "boot.exe" ./boot.exe --release --display progress
+    ./_boot/default/bin/main.exe install dune \
+				 --build-dir _boot --prefix "$PREFIX"
+    run "dune version" dune --version
+    echo "-=-=- Dune installed -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+fi
+
 if [ -n "$OCAMLFIND_VERSION" ]; then
     cd $APPVEYOR_BUILD_FOLDER
 
@@ -103,20 +118,6 @@ if [ -n "$OCAMLFIND_VERSION" ]; then
     run "ocamlfind printconf" ocamlfind printconf
 
     echo "-=-=- ocamlfind installed -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-fi
-
-if [ -n "$INSTALL_DUNE" ]; then
-    cd $APPVEYOR_BUILD_FOLDER
-    echo
-    echo "-=-=- Install Dune -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
-    #git clone https://github.com/ocaml/dune.git --depth 1 --branch=master
-    git clone https://github.com/Chris00/dune.git --depth 1 --branch=master
-    cd dune
-    ocaml bootstrap.ml
-    ./boot.exe
-    ./_boot/default/bin/main.exe build @install
-    ./_boot/default/bin/main.exe install dune --prefix $PREFIX
-    run "dune version" dune --version
 fi
 
 if [ -n "$INSTALL_OPAM" ]; then

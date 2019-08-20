@@ -32,7 +32,7 @@ set Path=C:\cygwin\bin;%Path%
 
 call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
 
-set Path=%OCAMLROOT%\bin;%OCAMLROOT%\bin\flexdll;%Path%
+set Path=%OCAMLROOT%\bin;%OCAMLROOT%\bin\flexdll;C:\opam\bin;%Path%
 set CAML_LD_LIBRARY_PATH=%OCAMLROOT%/lib/stublibs
 
 set CYGWINBASH=C:\cygwin\bin\bash.exe

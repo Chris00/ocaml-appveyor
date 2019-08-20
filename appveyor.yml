@@ -15,10 +15,10 @@ environment:
     CYG_MIRROR: http://mirrors.kernel.org/sourceware/cygwin/
     CYG_CACHE: C:/cygwin/var/cache/setup
     OCAMLROOT: "%PROGRAMFILES%/OCaml"
-    OCAMLBRANCH: 4.07
+    OCAMLBRANCH: 4.08
     OCAMLFIND_VERSION: 1.8.1
     INSTALL_DUNE: True
-    # INSTALL_OPAM: True
+    INSTALL_OPAM: True
     # INSTALL_OCAMLBUILD: True
     # INSTALL_OASIS: True
 

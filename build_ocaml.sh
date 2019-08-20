@@ -127,20 +127,18 @@ if [ -n "$INSTALL_OPAM" ]; then
     git clone https://github.com/ocaml/opam.git --depth 1
     #git clone https://github.com/Chris00/opam.git --depth 1
     cd opam
-    OPAM_INSTALL="C:/opam"
     chmod +x shell/msvs-detect
-    run "Configure OPAM with --prefix=$OPAM_INSTALL" \
-        ./configure --prefix="$OPAM_INSTALL"
+    run "Configure OPAM with --prefix=$PREFIX" \
+        ./configure --prefix="$PREFIX"
 
+    export DUNE_ARGS=--promote-install-files
     run "Build external libraries" make lib-ext
     #ls -lR
     run "Build OPAM" make
 
     run "Install OPAM" make install
-    opam init -y -a
+    run "OPAM init" opam init -y -a --bare
     run "OPAM config" opam config env
-    # ls "$OPAM_INSTALL"
-    # mv "$OPAM_INSTALL"/* "$PREFIX/"
     # Install by hand, the above installation procedure fails on
     # Cygwin/Mingw
     # cp src/opam "$PREFIX/bin/opam.exe"

@@ -152,6 +152,10 @@ if [ -n "$INSTALL_OPAM" ]; then
 	opam install -y -v dune
 	dune --version
     fi
+    if [ -z "$INSTALL_OASIS" ]; then
+	run "OPAM install oasis" opam install oasis
+    fi
+    run "OPAM list" opam list -i
 fi
 
 if [ -n "$INSTALL_OCAMLBUILD" ]; then

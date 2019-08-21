@@ -145,6 +145,8 @@ if [ -n "$INSTALL_OPAM" ]; then
     # cp src/opam-admin "$PREFIX/bin/opam-admin.exe"
     # cp src/opam-admin.top "$PREFIX/bin/opam-admin-top.exe"
     # cp src/opam-installer "$PREFIX/bin/opam-installer.exe"
+    run "OPAM list" opam list -i
+    run "Switch to 4.07.1" opam switch create 4.07.1
     if [ -z "$OCAMLFIND_VERSION" ]; then
 	opam install -y -v ocamlfind
     fi
@@ -155,7 +157,6 @@ if [ -n "$INSTALL_OPAM" ]; then
     if [ -z "$INSTALL_OASIS" ]; then
 	run "OPAM install oasis" opam install oasis
     fi
-    run "OPAM list" opam list -i
 fi
 
 if [ -n "$INSTALL_OCAMLBUILD" ]; then
